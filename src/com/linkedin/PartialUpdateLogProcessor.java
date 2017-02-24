@@ -5,16 +5,23 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
 public class PartialUpdateLogProcessor {
 
     public static void main(String[] args) throws IOException {
+        computeNetworkSize(args[0]);
+
+    }
+
+    public static void computeNetworkSize(String dirName) throws IOException {
         System.out.println("Log_Process!!!");
         String workingDirectory = System.getProperty("user.dir");
-        String dataDirectoryStr = workingDirectory.substring(0, workingDirectory.lastIndexOf("/") + 1) + args[0];
+        String dataDirectoryStr = workingDirectory.substring(0, workingDirectory.lastIndexOf("/") + 1) + dirName;
         System.out.println(dataDirectoryStr);
 
         File dataDirectory = new File(dataDirectoryStr);
@@ -63,14 +70,56 @@ public class PartialUpdateLogProcessor {
                             }
                         }
 
-                        if (line.contains("PARTIAL")) {
-                            processingLine.substring(processingLine.indexOf(sizeEndDelimeter) + sizeEndDelimeter.length());
+                        /*if (line.contains("PARTIAL")) {
+                            processingLine = processingLine.substring(processingLine.indexOf(deltaSizeStartDelimeter) + deltaSizeStartDelimeter.length());
                             System.out.println(processingLine);
-                        }
+                        }*/
 
+                        User user = globalMap.get(memberId);
+                        if (user == null) {
+                            user = new User();
+                            globalMap.put(memberId, user);
+                        }
+                        user.fd = fd;
+                        user.sd = sd;
+
+                        User localUser = fileMap.get(memberId);
+                        if (localUser == null) {
+                            localUser = new User();
+                            fileMap.put(memberId, localUser);
+                        }
+                        localUser.fd = fd;
+                        localUser.sd = sd;
                     }
                 }
+                printResults(fileMap);
             }
         }
+        System.out.println("----------------------------------------------------");
+        System.out.println("Global Results!!!");
+        System.out.println("----------------------------------------------------");
+        printResults(globalMap);
+    }
+
+    private static void printResults(Map<Integer, User> userMap) {
+        List<User> userList = new ArrayList<User>(userMap.values());
+
+        int totalUniqueUsers = userList.size();
+        if (totalUniqueUsers == 0)
+            return;
+        System.out.println("----------------------------------------------------");
+        System.out.println("Total Daily Unique Member: " + totalUniqueUsers);
+        long fdSum = 0;
+        long sdSum = 0;
+        long count = 0;
+        for (User user: userList) {
+            fdSum += user.fd;
+            sdSum += user.sd;
+            count++;
+        }
+        System.out.println("Total Daily Unique Member: " + count);
+        System.out.println("Average Daily Unique Member's first degree size: " + fdSum/count);
+        System.out.println("Average Daily Unique Member's second degree size: " + sdSum/count);
+        System.out.println("----------------------------------------------------");
     }
 }
