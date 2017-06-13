@@ -16,7 +16,6 @@ public class PartialUpdateLogProcessor {
     //NetworkSizeReport.computeNetworkSize(args[0]);
     //NetworkSizeReport.computeNetworkSizeHistogram(args[0]);
     //PartialUpdateSavings.computePartialUpdateSavings(args[0]);
+    PartialUpdateTestReport.generateReport(args[0]);
   }
-
-
 }
