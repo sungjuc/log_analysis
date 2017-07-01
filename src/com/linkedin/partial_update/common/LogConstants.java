@@ -1,6 +1,6 @@
-package com.linkedin;
+package com.linkedin.partial_update.common;
 
-public class Constants {
+public class LogConstants {
 
   public static final String MEMBER_START = "member = ";
   public static final String MEMBER_END = ":";
@@ -21,5 +21,4 @@ public class Constants {
   public static final String LATENCY_END = " (1st = ";
 
   public static final String NEW_VALUE = "new value = ";
-
 }

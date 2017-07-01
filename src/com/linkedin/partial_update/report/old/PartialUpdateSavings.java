@@ -1,5 +1,7 @@
-package com.linkedin;
+package com.linkedin.partial_update.report.old;
 
+import com.linkedin.partial_update.common.Record;
+import com.linkedin.partial_update.util.Utils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,13 +11,13 @@ public class PartialUpdateSavings {
   public static void computePartialUpdateSavings(String dirName) throws Exception {
     File[] listOfFiles = Utils.getFileList(dirName);
 
-    List<User> globalList = new ArrayList<User>();
+    List<Record> globalList = new ArrayList<Record>();
 
     for (File file : listOfFiles) {
       if (file.isFile()) {
-        List<User> users = Utils.getUsersFromFile(file);
-        globalList.addAll(users);
-        printSavingResults(users);
+        List<Record> records = Utils.getEvaluationFromFile(file);
+        globalList.addAll(records);
+        printSavingResults(records);
       }
     }
     System.out.println("----------------------------------------------------");
@@ -24,8 +26,8 @@ public class PartialUpdateSavings {
     printSavingResults(globalList);
   }
 
-  private static void printSavingResults(List<User> users) {
-    int totalRequests = users.size();
+  private static void printSavingResults(List<Record> records) {
+    int totalRequests = records.size();
     int totalPartialUpdate = 0;
     int totalNormalUpdate = 0;
 
@@ -38,15 +40,15 @@ public class PartialUpdateSavings {
     long totalFdSaving = 0;
     long totalSdSaving = 0;
 
-    for (User user : users) {
-      totalFdSize += user.fd;
-      totalSdSize += user.sd;
-      if (user.isPartial) {
+    for (Record record : records) {
+      totalFdSize += record.fd;
+      totalSdSize += record.sd;
+      if (record.isPartial) {
         totalPartialUpdate++;
-        totalPUFdSize += user.fd;
-        totalPUSdSize += user.sd;
-        totalFdSaving += user.fd - user.d_fd;
-        totalSdSaving += user.sd - user.d_sd;
+        totalPUFdSize += record.fd;
+        totalPUSdSize += record.sd;
+        totalFdSaving += record.fd - record.d_fd;
+        totalSdSaving += record.sd - record.d_sd;
       } else {
         totalNormalUpdate++;
       }

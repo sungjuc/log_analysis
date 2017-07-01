@@ -1,5 +1,7 @@
-package com.linkedin;
+package com.linkedin.partial_update.report.old;
 
+import com.linkedin.partial_update.common.Record;
+import com.linkedin.partial_update.util.Utils;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,13 +18,13 @@ public class NetworkSizeReport {
   public static void computeNetworkSizeHistogram(String dirName) throws Exception {
     File[] listOfFiles = Utils.getFileList(dirName);
 
-    Map<Integer, User> globalMap = new HashMap<Integer, User>();
+    Map<Integer, Record> globalMap = new HashMap<Integer, Record>();
 
     for (File file : listOfFiles) {
       if (file.isFile()) {
-        List<User> users = Utils.getUsersFromFile(file);
-        for (User user : users) {
-          globalMap.put(user.id, user);
+        List<Record> records = Utils.getEvaluationFromFile(file);
+        for (Record record : records) {
+          globalMap.put(record.id, record);
         }
       }
     }
@@ -36,16 +38,16 @@ public class NetworkSizeReport {
   public static void computeNetworkSize(String dirName) throws IOException {
     File[] listOfFiles = Utils.getFileList(dirName);
 
-    Map<Integer, User> globalMap = new HashMap<Integer, User>();
+    Map<Integer, Record> globalMap = new HashMap<Integer, Record>();
 
     for (File file : listOfFiles) {
       if (file.isFile()) {
-        List<User> users = Utils.getUsersFromFile(file);
-        Map<Integer, User> fileMap = new HashMap<Integer, User>();
+        List<Record> records = Utils.getEvaluationFromFile(file);
+        Map<Integer, Record> fileMap = new HashMap<Integer, Record>();
 
-        for (User user : users) {
-          globalMap.put(user.id, user);
-          fileMap.put(user.id, user);
+        for (Record record : records) {
+          globalMap.put(record.id, record);
+          fileMap.put(record.id, record);
         }
         printNetworkSizeResults(fileMap);
       }
@@ -56,10 +58,10 @@ public class NetworkSizeReport {
     printNetworkSizeResults(globalMap);
   }
 
-  private static void printNetworkSizeResults(Map<Integer, User> userMap) {
-    List<User> userList = new ArrayList<User>(userMap.values());
+  private static void printNetworkSizeResults(Map<Integer, Record> userMap) {
+    List<Record> recordList = new ArrayList<Record>(userMap.values());
 
-    int totalUniqueUsers = userList.size();
+    int totalUniqueUsers = recordList.size();
     if (totalUniqueUsers == 0) {
       return;
     }
@@ -67,19 +69,19 @@ public class NetworkSizeReport {
     System.out.println("Total Daily Unique Member: " + totalUniqueUsers);
     long fdSum = 0;
     long sdSum = 0;
-    for (User user : userList) {
-      fdSum += user.fd;
-      sdSum += user.sd;
+    for (Record record : recordList) {
+      fdSum += record.fd;
+      sdSum += record.sd;
     }
     System.out.println("Average Daily Unique Member's first degree size: " + fdSum / totalUniqueUsers);
     System.out.println("Average Daily Unique Member's second degree size: " + sdSum / totalUniqueUsers);
     System.out.println("----------------------------------------------------");
   }
 
-  private static void printNetworkSizeHistogram(Map<Integer, User> userMap) throws IOException {
+  private static void printNetworkSizeHistogram(Map<Integer, Record> userMap) throws IOException {
     Map<Integer, Integer> fdHisto = new TreeMap<Integer, Integer>();
     Map<Integer, Integer> sdHisto = new TreeMap<Integer, Integer>();
-    for (Map.Entry<Integer, User> entry : userMap.entrySet()) {
+    for (Map.Entry<Integer, Record> entry : userMap.entrySet()) {
       int fd = entry.getValue().fd;
       int sd = entry.getValue().sd;
       Integer fdCount = fdHisto.get(fd);
@@ -103,10 +105,10 @@ public class NetworkSizeReport {
     printHistotoFile(sdHisto, sdHeader, "active-second-degree-histogram");
   }
 
-  private static void printNetworkSizeBucketHistogram(Map<Integer, User> userMap) throws Exception {
+  private static void printNetworkSizeBucketHistogram(Map<Integer, Record> userMap) throws Exception {
     Map<Integer, Integer> fdHisto = new TreeMap<Integer, Integer>();
     Map<Integer, Integer> sdHisto = new TreeMap<Integer, Integer>();
-    for (Map.Entry<Integer, User> entry : userMap.entrySet()) {
+    for (Map.Entry<Integer, Record> entry : userMap.entrySet()) {
       int fd = entry.getValue().fd;
       int sd = entry.getValue().sd;
 
